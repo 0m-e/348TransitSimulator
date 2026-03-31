@@ -1,15 +1,17 @@
 import pandas as pd
 from scipy.stats import poisson, nbinom, geom
 
-def get_proportions(prop_file): #takes csv file of error code proportions,
-    #returns as dict
+def get_error_prob(prop_file): #takes csv file of error code proportions,
+    #returns as dict of actual probabilities of each error occuring
 
-    bus_proportions = pd.read_csv(prop_file)
+    df = pd.read_csv(prop_file)
 
-
-    # Convert to dictionary: {column_name: value}
-    bus_dict = bus_proportions.iloc[0].to_dict()
-    return bus_dict
+    # Replace with actual column names if known
+    error_dict = dict(zip(
+        df["error_code"],
+        float(df["proportion"]) * 0.0174
+    ))
+    return error_dict
 
 #takes a csv file of distribution type and parameter, returns a dictionary of
 #error codes and their corresponding distributions
