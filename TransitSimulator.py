@@ -36,13 +36,6 @@ class Delay:
     def possible(self, v):  # Evaluate whether delay can occur for this vehicle configuration, to be used in subclasses
         return True  # Generic delay is always possible
 
-class Route:  # Unused currently
-    def __init__(self, ID, num_stops, expected_length, expected_intervals):
-        self.ID = ID #route_id i.e "510 SPADINA", "505 DUNDAS"
-        self.num_stops = num_stops #number of stops on the line (integer)
-        self.expected_length = expected_length #expected length of the line (in time)
-        self.expected_intervals = expected_intervals #expected amt of time to travel to each stop (list of integers), should sum to expected length
-
 
 def run_simulation(timesteps, vehicles, stops, delays, output):
     # Every time step, stop passenger arrival will be calculated and there will be a chance of delays
@@ -74,6 +67,7 @@ def run_simulation(timesteps, vehicles, stops, delays, output):
                     print(f"Vehicle {v.ID}: Delayed for {v.remaining_delay} more timesteps.", file=f)
 
                 v.remaining_delay -= 1
+                continue  # Dont allow for chance of new delay
 
             elif v.distance_to_next_stop > 0:  # Vehicle is between stops, not delayed
                 if v.print_updates:
