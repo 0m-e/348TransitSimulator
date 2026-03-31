@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib as plt
 rng = np.random.default_rng()
 
-
 class Vehicle:
     def __init__(self, ID, capacity, route, current_stop, oos=False, print_updates=False):
         self.ID = ID  # Vehicle name
@@ -42,8 +41,9 @@ class Route:
         self.ID = ID #route_id i.e "510 SPADINA", "505 DUNDAS"
         self.num_stops = num_stops #number of stops on the line (integer)
         self.expected_length = expected_length #expected length of the line (in time)
-        self.expected_intervals = expected_intervals #expected amt of time to travel to each stop (list of integers
-    #should sum to expected length
+        self.expected_intervals = expected_intervals #expected amt of time to travel to each stop (list of integers), should sum to expected length
+    
+    
 def run_simulation(timesteps, vehicles, stops, delays, output):
     # Every time step, stop passenger arrival will be calculated and there will be a chance of delays
     # delays is list of delays that are possible in this simulation
@@ -121,17 +121,7 @@ def run_simulation(timesteps, vehicles, stops, delays, output):
                             print(f"Vehicle {v.ID}: Delay type [{d.ID}] occurred with duration {time}. Remaining delay is now {v.remaining_delay}.", file=f)
 
 
-        print("\n", file=f)  # Maybe idk if it looks good
+        print("\n", file=f)  # Newline at end of every timestep summary
     f.close()
-
-
-# --- Program stops, vehicles, and delays here --- #
-# Stop(ID, waiting_passengers, distance_from_prev_stop, passenger_arrival_mean, passenger_deboard_p, terminal=False, print_updates=False)
-# Vehicle(ID, capacity, route, current_stop, oos=False, print_updates=False)
-# Delay(ID, prob, duration_mean)
-
-stops = [Stop(0, 0, 5, 0.5, 0.2, False, print_updates=True), Stop(1, 0, 5, 0, 1, True, print_updates=True)]
-vehs = [Vehicle(0, 10, stops, 0, print_updates=True), Vehicle(1, 10, stops, 0, print_updates=True)]
-delays = [Delay("Test Delay", 0.1, 1/(3+1), 1)]  # mu = (1-p)/p <-> p = 1/(mu+1)
-
-run_simulation(20, vehs, stops, delays, "summary.txt")
+    
+# aw
