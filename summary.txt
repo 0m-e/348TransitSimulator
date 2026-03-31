@@ -1,0 +1,144 @@
+--- Timestep 0 Summary ---
+Stop 0: 1 passengers arrived. Total: 1
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0 @ Stop 0: Boarded 1, Deboarded 0, Capacity 1/10
+Vehicle 1 @ Stop 0: Boarded 0, Deboarded 0, Capacity 0/10
+
+
+--- Timestep 1 Summary ---
+Stop 0: 0 passengers arrived. Total: 0
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: 5 timesteps away from Stop 1 carrying 1/10 passengers.
+Vehicle 1: 5 timesteps away from Stop 1 carrying 0/10 passengers.
+Vehicle 1: Delay type [Test Delay] occurred with duration 1. Remaining delay is now 1.
+
+
+--- Timestep 2 Summary ---
+Stop 0: 2 passengers arrived. Total: 2
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: 4 timesteps away from Stop 1 carrying 1/10 passengers.
+Vehicle 1: Delayed for 1 more timesteps.
+
+
+--- Timestep 3 Summary ---
+Stop 0: 2 passengers arrived. Total: 4
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: 3 timesteps away from Stop 1 carrying 1/10 passengers.
+Vehicle 1: 4 timesteps away from Stop 1 carrying 0/10 passengers.
+
+
+--- Timestep 4 Summary ---
+Stop 0: 0 passengers arrived. Total: 4
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: 2 timesteps away from Stop 1 carrying 1/10 passengers.
+Vehicle 0: Delay type [Test Delay] occurred with duration 1. Remaining delay is now 1.
+Vehicle 1: 3 timesteps away from Stop 1 carrying 0/10 passengers.
+
+
+--- Timestep 5 Summary ---
+Stop 0: 1 passengers arrived. Total: 5
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Delayed for 1 more timesteps.
+Vehicle 1: 2 timesteps away from Stop 1 carrying 0/10 passengers.
+Vehicle 1: Delay type [Test Delay] occurred with duration 2. Remaining delay is now 2.
+
+
+--- Timestep 6 Summary ---
+Stop 0: 0 passengers arrived. Total: 5
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: 1 timesteps away from Stop 1 carrying 1/10 passengers.
+Vehicle 1: Delayed for 2 more timesteps.
+
+
+--- Timestep 7 Summary ---
+Stop 0: 0 passengers arrived. Total: 5
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0 @ Stop 1: Boarded 0, Deboarded 1, Capacity 0/10
+Vehicle 1: Delayed for 1 more timesteps.
+
+
+--- Timestep 8 Summary ---
+Stop 0: 0 passengers arrived. Total: 5
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: 1 timesteps away from Stop 1 carrying 0/10 passengers.
+Vehicle 1: Delay type [Test Delay] occurred with duration 5. Remaining delay is now 5.
+
+
+--- Timestep 9 Summary ---
+Stop 0: 0 passengers arrived. Total: 5
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Delayed for 5 more timesteps.
+
+
+--- Timestep 10 Summary ---
+Stop 0: 1 passengers arrived. Total: 6
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Delayed for 4 more timesteps.
+
+
+--- Timestep 11 Summary ---
+Stop 0: 0 passengers arrived. Total: 6
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Delayed for 3 more timesteps.
+
+
+--- Timestep 12 Summary ---
+Stop 0: 0 passengers arrived. Total: 6
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Delayed for 2 more timesteps.
+
+
+--- Timestep 13 Summary ---
+Stop 0: 0 passengers arrived. Total: 6
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Delayed for 1 more timesteps.
+
+
+--- Timestep 14 Summary ---
+Stop 0: 1 passengers arrived. Total: 7
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1 @ Stop 1: Boarded 0, Deboarded 0, Capacity 0/10
+
+
+--- Timestep 15 Summary ---
+Stop 0: 1 passengers arrived. Total: 8
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Out of service.
+
+
+--- Timestep 16 Summary ---
+Stop 0: 1 passengers arrived. Total: 9
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Out of service.
+
+
+--- Timestep 17 Summary ---
+Stop 0: 1 passengers arrived. Total: 10
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Out of service.
+
+
+--- Timestep 18 Summary ---
+Stop 0: 0 passengers arrived. Total: 10
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Out of service.
+
+
+--- Timestep 19 Summary ---
+Stop 0: 1 passengers arrived. Total: 11
+Stop 1: 0 passengers arrived. Total: 0
+Vehicle 0: Out of service.
+Vehicle 1: Out of service.
+
+
