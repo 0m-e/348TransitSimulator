@@ -26,22 +26,25 @@ class Stop:
         self.print_updates = print_updates  # Print updates about this object to timestep summary
         
 class Delay:
-    def __init__(self, ID, prob, duration_mean, fatal=False):
+    def __init__(self, ID, prob, duration_p, duration_n, fatal=False):
         self.ID = ID  # Type of delay
         self.prob = prob  # Probability of occurrence on each timestep
-        self.duration_mean = duration_mean  # Mean number of timesteps delay will apply for
+        self.duration_p = duration_p  # p parameter in negative binomial sample for delay duration
+        self.duration_n = duration_n  # n parameter in negative binomial sample for delay duration
         self.fatal = fatal  # Bool for whether delay causes vehcle to be permanently out of service
         
     def possible(self, v):  # Evaluate whether delay can occur for this vehicle configuration, to be used in subclasses
         return True  # Generic delay is always possible
         
 
-def run_simulation(timesteps, vehicles, stops, delays):
+def run_simulation(timesteps, vehicles, stops, delays, output):
     # Every time step, stop passenger arrival will be calculated and there will be a chance of delays
     # delays is list of delays that are possible in this simulation
     
+    f = open(output, "w")
+    
     for t in range(timesteps):
-        print(f"--- Timestep {t} Summary ---")
+        print(f"--- Timestep {t} Summary ---", file=f)
         
         # Firstly passengers arrive at stops
         for s in stops:
@@ -49,25 +52,25 @@ def run_simulation(timesteps, vehicles, stops, delays):
             s.waiting_passengers += arriving
             
             if s.print_updates:
-                print(f"Stop {s.ID}: {arriving} passengers arrived. Total: {s.waiting_passengers}")
+                print(f"Stop {s.ID}: {arriving} passengers arrived. Total: {s.waiting_passengers}", file=f)
         
         # Secondly vehicles are updated, if at stop they load/unload, if not they move forward
         # If at terminal all passengers unload, vehicle is deleted and stats are collected
         for v in vehicles:
             if v.oos:
                 if v.print_updates:
-                    print(f"Vehicle {v.ID}: Out of service.")
+                    print(f"Vehicle {v.ID}: Out of service.", file=f)
                 continue  # Do nothing
                 
             elif v.remaining_delay > 0:  # Vehicle is delayed
                 if v.print_updates:
-                    print(f"Vehicle {v.ID}: Delayed for {v.remaining_delay} more timesteps.")
+                    print(f"Vehicle {v.ID}: Delayed for {v.remaining_delay} more timesteps.", file=f)
                     
                 v.remaining_delay -= 1
                 
             elif v.distance_to_next_stop > 0:  # Vehicle is between stops, not delayed
                 if v.print_updates:
-                    print(f"Vehicle {v.ID}: {v.distance_to_next_stop} timesteps away from Stop {v.current_stop} carrying {v.passengers}/{v.capacity} passengers.")
+                    print(f"Vehicle {v.ID}: {v.distance_to_next_stop} timesteps away from Stop {v.current_stop} carrying {v.passengers}/{v.capacity} passengers.", file=f)
                     
                 v.distance_to_next_stop -= 1
                  
@@ -87,7 +90,7 @@ def run_simulation(timesteps, vehicles, stops, delays):
                 stop.waiting_passengers -= boarded
                 
                 if v.print_updates:
-                    print(f"Vehicle {v.ID} @ Stop {v.current_stop}: Boarded {boarded}, Deboarded {deboarded}, Capacity {v.passengers}/{v.capacity}")
+                    print(f"Vehicle {v.ID} @ Stop {v.current_stop}: Boarded {boarded}, Deboarded {deboarded}, Capacity {v.passengers}/{v.capacity}", file=f)
                 
                 # Set next stop
                 if stop.terminal:  # Current stop is terminal
@@ -104,14 +107,15 @@ def run_simulation(timesteps, vehicles, stops, delays):
                     # Delay is possible for vehicle configuration, now determine whether it actually happens
                     if rng.binomial(1, d.prob):
                         # Delay occurs
-                        time = rng.geometric(1/d.duration_mean)  # duration_mean is mean number of timesteps for delay, so p = 1/mu
+                        time = rng.negative_binomial(d.duration_n, d.duration_p) + d.duration_n # p = 1/(mu + 1)
                         v.remaining_delay += time
                         
                         if v.print_updates:
-                            print(f"Vehicle {v.ID}: Delay type [{d.ID}] occurred with duration {time}. Remaining delay is now {v.remaining_delay}.")
+                            print(f"Vehicle {v.ID}: Delay type [{d.ID}] occurred with duration {time}. Remaining delay is now {v.remaining_delay}.", file=f)
             
         
-        print("\n")  # Maybe idk if it looks good
+        print("\n", file=f)  # Maybe idk if it looks good
+    f.close()
 
 
 # --- Program stops, vehicles, and delays here --- #
@@ -121,6 +125,6 @@ def run_simulation(timesteps, vehicles, stops, delays):
 
 stops = [Stop(0, 0, 5, 0.5, 0.2, False, print_updates=True), Stop(1, 0, 5, 0, 1, True, print_updates=True)]
 vehs = [Vehicle(0, 10, stops, 0, print_updates=True), Vehicle(1, 10, stops, 0, print_updates=True)]
-delays = [Delay("Test Delay", 0.1, 3)]
+delays = [Delay("Test Delay", 0.1, 1/(3+1), 1)]  # mu = (1-p)/p <-> p = 1/(mu+1)
 
-run_simulation(20, vehs, stops, delays)
+run_simulation(20, vehs, stops, delays, "summary.txt")
