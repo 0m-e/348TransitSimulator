@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib as plt
-
 rng = np.random.default_rng()
 
 class Vehicle:
@@ -37,7 +36,7 @@ class Delay:
     def possible(self, v):  # Evaluate whether delay can occur for this vehicle configuration, to be used in subclasses
         return True  # Generic delay is always possible
 
-class Route:
+class Route:  # Unused currently
     def __init__(self, ID, num_stops, expected_length, expected_intervals):
         self.ID = ID #route_id i.e "510 SPADINA", "505 DUNDAS"
         self.num_stops = num_stops #number of stops on the line (integer)
