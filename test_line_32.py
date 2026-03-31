@@ -1,50 +1,10 @@
+import TransitSimulator as sim
+import distribution_fitting as dist
+import pandas as pd
 import numpy as np
-import matplotlib as plt
 rng = np.random.default_rng()
 
-class Vehicle:
-    def __init__(self, ID, capacity, route, current_stop, oos=False, print_updates=False):
-        self.ID = ID  # Vehicle name
-        self.capacity = capacity  # Max passengers
-        self.route = route  # Must be list of stops
-        self.current_stop = current_stop  # Current stop
-        self.oos = oos  # Out of service, used in vehicle loop to make this vehicle do nothing, in constructor so it is possible to start out of service
-        self.print_updates = print_updates  # Print updates about this object to timestep summary
-
-        self.passengers = 0
-        self.distance_to_next_stop = 0  # Vehicles will all initialize at a stop
-        self.remaining_delay = 0  # Initialize delay time variable
-
-class Stop:
-    def __init__(self, ID, waiting_passengers, distance_from_prev_stop, passenger_arrival_mean, passenger_deboard_p, terminal=False, print_updates=False):
-        self.ID = ID  # Stop name
-        self.distance_from_prev_stop = distance_from_prev_stop  # Distance from previous stop in timesteps, should have avg of ~5
-        self.terminal = terminal  # Bool for if its the last stop, default False
-        self.waiting_passengers = waiting_passengers
-        self.passenger_arrival_mean = passenger_arrival_mean  # Mean number of passengers arriving per timestep
-        self.passenger_deboard_p = passenger_deboard_p  # Probability each passenger deboards at this stop
-        self.print_updates = print_updates  # Print updates about this object to timestep summary
-
-class Delay:
-    def __init__(self, ID, prob, duration_n, duration_p, fatal=False):
-        self.ID = ID  # Type of delay
-        self.prob = prob  # Probability of occurrence on each timestep
-        self.duration_p = duration_p  # p parameter in negative binomial sample for delay duration
-        self.duration_n = duration_n  # n parameter in negative binomial sample for delay duration
-        self.fatal = fatal  # Bool for whether delay causes vehcle to be permanently out of service
-
-    def possible(self, v):  # Evaluate whether delay can occur for this vehicle configuration, to be used in subclasses
-        return True  # Generic delay is always possible
-
-class Route:  # Unused currently
-    def __init__(self, ID, num_stops, expected_length, expected_intervals):
-        self.ID = ID #route_id i.e "510 SPADINA", "505 DUNDAS"
-        self.num_stops = num_stops #number of stops on the line (integer)
-        self.expected_length = expected_length #expected length of the line (in time)
-        self.expected_intervals = expected_intervals #expected amt of time to travel to each stop (list of integers), should sum to expected length, numstops-1 entries
-
-
-def run_simulation(timesteps, vehicles, stops, delays, output,):
+def alt_run_simulation(timesteps, vehicles, stops, delays, output, delay_occured):
     # Every time step, stop passenger arrival will be calculated and there will be a chance of delays
     # delays is list of delays that are possible in this simulation
 
@@ -116,6 +76,7 @@ def run_simulation(timesteps, vehicles, stops, delays, output,):
                         # Delay occurs
                         time = rng.negative_binomial(d.duration_n, d.duration_p) + d.duration_n # p = 1/(mu + 1)
                         v.remaining_delay += time
+                        delay_occured = True
 
                         if v.print_updates:
                             print(f"Vehicle {v.ID}: Delay type [{d.ID}] occurred with duration {time}. Remaining delay is now {v.remaining_delay}.", file=f)
@@ -124,4 +85,34 @@ def run_simulation(timesteps, vehicles, stops, delays, output,):
         print("\n", file=f)  # Newline at end of every timestep summary
     f.close()
 
-# aw
+error_dict = dist.get_error_prob("data/processed/bus_proportions.csv")
+df = pd.read_csv("data/processed/bus_delay_model_results.csv")
+
+size_list = df["size"].tolist()
+prob_list = df["mu"].tolist()
+delay_list = []
+for (size, prob), (key, value) in zip(zip(size_list, prob_list), error_dict.items()):
+    delay_list.append(sim.Delay(key, value, size, prob))
+delays = delay_list
+# sim.Stop(ID, waiting_passengers, distance_from_prev_stop, passenger_arrival_mean, passenger_deboard_p, terminal=False, print_updates=False)
+# sim.Vehicle(ID, capacity, route, current_stop, oos=False, print_updates=False)
+# sim.Delay(ID, prob, duration_p, duration_n)
+stops = [sim.Stop("Renforth", 0, 5, 0.5, 0.2, False, False),
+         sim.Stop("East Mall", 0, 5, 0.5, 0.2, False, False),
+         sim.Stop("Martin Grove", 0, 5, 0.5, 0.2, False, False),
+         sim.Stop("Kipling Ave", 0, 5, 0.5, 0.2, False, False),
+         sim.Stop("Islington Ave", 0, 5, 0.5, 0.2, False, False),
+         sim.Stop("Royal York Rd", 0, 5, 0.5, 0.2, False, False),
+         sim.Stop("Scarlett Rd", 0, 5, 0.5, 0.2, False, False),
+         sim.Stop("Jane St", 0, 5, 0.5, 0.2, False, False),
+         sim.Stop("Weston Road", 0, 5, 0.5, 0.2, False, False),
+         sim.Stop("Mount Dennis Station", 0, 5, 0, 1, True, False)
+
+]
+vehs = [sim.Vehicle(0, 50, stops, 0, print_updates=False)]
+
+#sim loop
+delay_counter = 0
+while delay_counter <392:
+    alt_run_simulation(100)
+

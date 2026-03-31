@@ -21,3 +21,4 @@ for (size, prob), (key, value) in zip(zip(size_list, prob_list), error_dict.item
 delays = delay_list
 
 sim.run_simulation(20, vehs, stops, delays, "summary.txt")
+
