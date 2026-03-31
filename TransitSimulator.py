@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib as plt
+
 rng = np.random.default_rng()
 
 class Vehicle:
@@ -26,7 +27,7 @@ class Stop:
         self.print_updates = print_updates  # Print updates about this object to timestep summary
 
 class Delay:
-    def __init__(self, ID, prob, duration_p, duration_n, fatal=False):
+    def __init__(self, ID, prob, duration_n, duration_p, fatal=False):
         self.ID = ID  # Type of delay
         self.prob = prob  # Probability of occurrence on each timestep
         self.duration_p = duration_p  # p parameter in negative binomial sample for delay duration
@@ -42,8 +43,8 @@ class Route:
         self.num_stops = num_stops #number of stops on the line (integer)
         self.expected_length = expected_length #expected length of the line (in time)
         self.expected_intervals = expected_intervals #expected amt of time to travel to each stop (list of integers), should sum to expected length
-    
-    
+
+
 def run_simulation(timesteps, vehicles, stops, delays, output):
     # Every time step, stop passenger arrival will be calculated and there will be a chance of delays
     # delays is list of delays that are possible in this simulation
@@ -123,5 +124,5 @@ def run_simulation(timesteps, vehicles, stops, delays, output):
 
         print("\n", file=f)  # Newline at end of every timestep summary
     f.close()
-    
+
 # aw

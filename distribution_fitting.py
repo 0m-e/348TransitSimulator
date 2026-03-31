@@ -8,8 +8,8 @@ def get_error_prob(prop_file): #takes csv file of error code proportions,
 
     # Replace with actual column names if known
     error_dict = dict(zip(
-        df["error_code"],
-        float(df["proportion"]) * 0.0174
+        df["col"],
+        df["Freq"] * 0.0174
     ))
     return error_dict
 
