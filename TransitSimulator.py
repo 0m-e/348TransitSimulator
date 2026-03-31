@@ -126,14 +126,14 @@ def run_simulation(timesteps, vehicles, stops, delays, output):
     f.close()
 
 
-bus_proportions = pd.read_csv("bus_proportions.csv")
-streetcar_porportions = pd.read_csv("streetcar_proportions.csv")
+bus_proportions = pd.read_csv("data/processed/bus_proportions.csv")
+streetcar_porportions = pd.read_csv("data/processed/streetcar_proportions.csv")
 
 # Convert to dictionary: {column_name: value}
 bus_dict = bus_proportions.iloc[0].to_dict()
 streetcar_dict = streetcar_porportions.iloc[0].to_dict()
 
-df = pd.read_csv("bus_delay_model_results.csv")
+df = pd.read_csv("data/processed/bus_delay_model_results.csv")
 
 # Dictionary to store PMFs
 pmf_dict = {}
