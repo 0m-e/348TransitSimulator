@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib as plt
 rng = np.random.default_rng()
-import pandas as pd
-from scipy.stats import poisson, nbinom, geom
+
 
 class Vehicle:
     def __init__(self, ID, capacity, route, current_stop, oos=False, print_updates=False):
@@ -125,49 +124,6 @@ def run_simulation(timesteps, vehicles, stops, delays, output):
         print("\n", file=f)  # Maybe idk if it looks good
     f.close()
 
-
-bus_proportions = pd.read_csv("data/processed/bus_proportions.csv")
-streetcar_porportions = pd.read_csv("data/processed/streetcar_proportions.csv")
-
-# Convert to dictionary: {column_name: value}
-bus_dict = bus_proportions.iloc[0].to_dict()
-streetcar_dict = streetcar_porportions.iloc[0].to_dict()
-
-df = pd.read_csv("data/processed/bus_delay_model_results.csv")
-
-# Dictionary to store PMFs
-pmf_dict = {}
-
-for _, row in df.iterrows():
-    code = row["delay_code"]
-    model = row["best_model"]
-
-    if model == "pois":
-        lam = row["lambda"]
-
-        def pmf(k, lam=lam):
-            return poisson.pmf(k, mu=lam)
-
-    elif model == "nb":
-        size = row["size"]   # corresponds to 'n'
-        mu = row["mu"]
-
-        # Convert (size, mu) → (n, p) for scipy
-        p = size / (size + mu)
-
-        def pmf(k, size=size, p=p):
-            return nbinom.pmf(k, n=size, p=p)
-
-    elif model == "geom":
-        p = row["prob"]
-
-        def pmf(k, p=p):
-            return geom.pmf(k, p=p)
-
-    else:
-        continue
-
-    pmf_dict[code] = pmf
 
 # --- Program stops, vehicles, and delays here --- #
 # Stop(ID, waiting_passengers, distance_from_prev_stop, passenger_arrival_mean, passenger_deboard_p, terminal=False, print_updates=False)
