@@ -37,7 +37,7 @@ class Delay:
         return True  # Generic delay is always possible
 
 
-def run_simulation(timesteps, vehicles, stops, delays, output):
+def run_simulation(timesteps, vehicles, stops, delays, output, loop=False):
     # Every time step, stop passenger arrival will be calculated and there will be a chance of delays
     # delays is list of delays that are possible in this simulation
 
@@ -95,8 +95,13 @@ def run_simulation(timesteps, vehicles, stops, delays, output):
 
                 # Set next stop
                 if stop.terminal:  # Current stop is terminal
-                    # Take veh out of service
-                    v.oos = True;
+                    if loop:
+                        # Go back to first stop
+                        v.current_stop = 0
+                        v.distance_to_next_stop = v.route[v.current_stop].distance_from_prev_stop
+                    else:
+                        # Take veh out of service
+                        v.oos = True;
                 else:
                     v.current_stop += 1
                     v.distance_to_next_stop = v.route[v.current_stop].distance_from_prev_stop
