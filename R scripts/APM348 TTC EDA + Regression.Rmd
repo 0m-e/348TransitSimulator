@@ -1,0 +1,327 @@
+---
+title: "Project1"
+output: pdf_document
+date: "2025-12-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("opendatatoronto")
+install.packages("partykit")
+library(opendatatoronto)
+library(dplyr)
+library(tidyverse)
+library(rpart)
+library(partykit)
+library(pROC)
+library(randomForest)
+
+# get package
+package <- show_package("31edb669-70be-4da5-9dcc-b11cc2cfbf07")
+package
+glimpse(package)
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+getwd()
+list.files()
+
+delay_data <- read_csv("TTC LRT Delays.csv")
+code_descriptions <- read_csv("Code Descriptions.csv")
+bus_data <- read_csv("TTC Bus Delay Data since 2025.csv")
+bus_codes <- read_csv("Code Descriptions-2.csv")
+
+
+glimpse(bus_codes)
+glimpse(bus_data)
+
+glimpse(code_descriptions)
+glimpse(delay_data)
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+avg_delay <- mean(delay_data$`Min Delay`)
+avg_delay
+causes <- delay_data %>% group_by(Code) %>%
+
+    summarise(
+    n = n()
+    ,
+    avg_min_delay = mean(`Min Delay`)
+    )
+
+delay_with_desc <- delay_data %>%
+  left_join(
+    code_descriptions %>% select(CODE, DESCRIPTION),
+    by = c("Code" = "CODE")
+  )
+
+delay_with_desc %>%
+  distinct(Code, DESCRIPTION) %>%
+  arrange(Code) %>%
+  print(n = 100)
+
+causes_with_reason <- causes %>%
+  left_join(code_descriptions %>% select(CODE, DESCRIPTION), by = c("Code" = "CODE"))
+
+
+print(causes_with_reason)
+
+delay_with_desc <- delay_with_desc %>%
+  mutate(
+    avg_min_delay = mean(`Min Delay`),
+    cause_group = case_when(
+      grepl("TRAFFIC|COLLISION|AUTO|VEHICLE|ROAD", DESCRIPTION, ignore.case = TRUE) ~ "Traffic/Road",
+      grepl("BRAKE|HVAC|DOOR|PANTO|EQUIPMENT|MECHANICAL", DESCRIPTION, ignore.case = TRUE) ~ "Mechanical",
+      grepl("OPERATOR|CONTROL|SIGNAL|SWITCH|S&TCS", DESCRIPTION, ignore.case = TRUE) ~ "Operations/Control",
+      grepl("PASSENGER|CUSTOMER", DESCRIPTION, ignore.case = TRUE) ~ "Passenger",
+      grepl("WEATHER|POLICE|FIRE|MEDICAL", DESCRIPTION, ignore.case = TRUE) ~ "External",
+      TRUE ~ "Other"
+    )
+  )
+
+delay_with_desc <- delay_with_desc %>%
+  group_by(cause_group) %>%
+  summarise(avg_min_delay = mean(`Min Delay`, na.rm = TRUE))
+
+ ggplot(delay_with_desc, aes(x = as.factor(cause_group), y = avg_min_delay)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  geom_text(aes(label = round(avg_min_delay, 1)), vjust = -0.5) +
+  labs(
+    x = " Cause Groups", 
+    y = "Average Minimum Delays",
+    title = "Average Minimum Delays for Incidents"
+  ) +
+  theme_minimal()
+
+glimpse(delay_with_desc)
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+avg_delay <- mean(delay_data$`Min Delay`)
+avg_delay
+causes <- delay_data %>% group_by(Code) %>%
+
+    summarise(
+    n = n()
+    ,
+    avg_min_delay = mean(`Min Delay`)
+    )
+
+delay_with_desc <- delay_data %>%
+  left_join(
+    code_descriptions %>% select(CODE, DESCRIPTION),
+    by = c("Code" = "CODE")
+  )
+
+delay_with_desc %>%
+  distinct(Code, DESCRIPTION) %>%
+  arrange(Code) %>%
+  print(n = 100)
+
+causes_with_reason <- causes %>%
+  left_join(code_descriptions %>% select(CODE, DESCRIPTION), by = c("Code" = "CODE"))
+
+
+print(causes_with_reason)
+
+delay_with_desc <- delay_with_desc %>%
+  mutate(
+    avg_min_delay = mean(`Min Delay`),
+    cause_group = case_when(
+      grepl("TRAFFIC|COLLISION|AUTO|VEHICLE|ROAD", DESCRIPTION, ignore.case = TRUE) ~ "Traffic/Road",
+      grepl("BRAKE|HVAC|DOOR|PANTO|EQUIPMENT|MECHANICAL", DESCRIPTION, ignore.case = TRUE) ~ "Mechanical",
+      grepl("OPERATOR|CONTROL|SIGNAL|SWITCH|S&TCS", DESCRIPTION, ignore.case = TRUE) ~ "Operations/Control",
+      grepl("PASSENGER|CUSTOMER", DESCRIPTION, ignore.case = TRUE) ~ "Passenger",
+      grepl("WEATHER|POLICE|FIRE|MEDICAL", DESCRIPTION, ignore.case = TRUE) ~ "External",
+      TRUE ~ "Other"
+    )
+  )
+
+delay_with_desc <- delay_with_desc %>%
+  group_by(cause_group) %>%
+  summarise(avg_min_delay = mean(`Min Delay`, na.rm = TRUE))
+
+ ggplot(delay_with_desc, aes(x = as.factor(cause_group), y = avg_min_delay)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  geom_text(aes(label = round(avg_min_delay, 1)), vjust = -0.5) +
+  labs(
+    x = " Cause Groups", 
+    y = "Average Minimum Delays",
+    title = "Average Minimum Delays for Incidents"
+  ) +
+  theme_minimal()
+
+glimpse(delay_with_desc)
+max <- max(causes_with_reason$avg_min_delay)
+print(max)
+causes_with_reason %>%
+  slice_max(DESCRIPTION, n = 1)
+unique(delay_with_desc$avg_min_delay)
+max <- max(causes_with_reason$avg_min_delay)
+print(max)
+causes_with_reason %>%
+  slice_max(DESCRIPTION, n = 1)
+unique(delay_with_desc$avg_min_delay)
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r pressure, echo=FALSE} 
+
+bus_causes <- bus_data %>% group_by(Code) %>%
+
+    summarise(
+    n = n(),
+    avg_min_delay = mean(`Min Delay`)
+    )
+
+bus_with_desc <- bus_data %>%
+  left_join(
+    bus_codes %>% select(CODE, DESCRIPTION),
+    by = c("Code" = "CODE")
+  )
+
+bus_with_desc %>%
+  distinct(Code, DESCRIPTION) %>%
+  arrange(Code) %>%
+  print(n = 100)
+
+bus_with_reason <- bus_causes %>%
+  left_join(bus_codes %>% select(CODE, DESCRIPTION), by = c("Code" = "CODE"))
+
+print(causes_with_reason)
+
+bus_with_desc <- bus_with_desc %>%
+  mutate(
+    avg_min_delay = mean(`Min Delay`),
+    cause_group = case_when(
+      grepl("TRAFFIC|COLLISION|AUTO|VEHICLE|ROAD", DESCRIPTION, ignore.case = TRUE) ~ "Traffic/Road",
+      grepl("BRAKE|HVAC|DOOR|PANTO|EQUIPMENT|MECHANICAL", DESCRIPTION, ignore.case = TRUE) ~ "Mechanical",
+      grepl("OPERATOR|CONTROL|SIGNAL|SWITCH|S&TCS", DESCRIPTION, ignore.case = TRUE) ~ "Operations/Control",
+      grepl("PASSENGER|CUSTOMER", DESCRIPTION, ignore.case = TRUE) ~ "Passenger",
+      grepl("WEATHER|POLICE|FIRE|MEDICAL", DESCRIPTION, ignore.case = TRUE) ~ "External",
+      TRUE ~ "Other"
+    )
+  )
+
+bus_with_desc <- bus_with_desc %>%
+  group_by(cause_group) %>%
+  summarise(avg_min_delay = mean(`Min Delay`, na.rm = TRUE))
+
+ ggplot(bus_with_desc, aes(x = as.factor(cause_group), y = avg_min_delay)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  geom_text(aes(label = round(avg_min_delay, 1)), vjust = -0.5) +
+  labs(
+    x = " Cause Groups", 
+    y = "Average Minimum Delays",
+    title = "Average Minimum Delays for Incidents"
+  ) +
+  theme_minimal()
+```
+
+
+
+
+```{r pressure, echo=FALSE} 
+##regression for buses
+
+bus_data <- bus_data %>%
+  mutate(
+    Bound = ifelse(Bound %in% c("N", "S", "E", "W", "NB", "SB", "EB", "WB"),
+                   Bound, "Other"),
+    Bound = factor(Bound),
+    hour = as.integer(format(Time, "%H")),
+    peak = ifelse(hour %in% c(7,8,9,16,17,18), 1, 0)
+  )
+
+set.seed(348)
+idx <- sample(seq_len(nrow(bus_data)), size = round(0.8 * nrow(bus_data)))
+
+train <- bus_data[idx, ]
+test  <- bus_data[-idx, ]
+
+train <- train %>%
+  mutate(hour = as.integer(substr(as.character(Time), 1, 2)))
+
+train_clean <- na.omit(train)
+
+test <- test %>%
+  mutate(hour = as.integer(substr(as.character(Time), 1, 2)))
+
+train_clean <- train %>%
+  drop_na(`Min Delay`, hour)
+
+model <- lm(`Min Delay` ~ hour, data = train_clean)
+
+yhat_test <- predict(model, newdata = test)
+y_test <- test$`Min Delay`
+y_test
+rmse <- sqrt(mean((y_test - yhat_test)^2, na.rm = TRUE))
+summary(model)
+## cause group and delay relationship 
+```
+
+
+
+
+```{r pressure, echo=FALSE}
+### regression
+delay_data <- delay_data %>%
+  mutate(
+    Bound = ifelse(Bound %in% c("N", "S", "E", "W", "NB", "SB", "EB", "WB"),
+                   Bound, "Other"),
+    Bound = factor(Bound),
+    hour = as.integer(format(Time, "%H")),
+    peak = ifelse(hour %in% c(7,8,9,16,17,18), 1, 0)
+  )
+
+set.seed(348)
+idx <- sample(seq_len(nrow(delay_data)), size = round(0.8 * nrow(delay_data)))
+
+train <- delay_data[idx, ]
+test  <- delay_data[-idx, ]
+
+train <- train %>%
+  mutate(hour = as.integer(substr(as.character(Time), 1, 2)))
+
+train_clean <- na.omit(train)
+
+test <- test %>%
+  mutate(hour = as.integer(substr(as.character(Time), 1, 2)))
+
+train_clean <- train %>%
+  drop_na(`Min Delay`, hour)
+
+model <- lm(`Min Delay` ~ hour, data = train_clean)
+
+yhat_test <- predict(model, newdata = test)
+y_test <- test$`Min Delay`
+y_test
+rmse <- sqrt(mean((y_test - yhat_test)^2, na.rm = TRUE))
+summary(model)
+
+### classification tree
+#tree <- rpart(`Min Delay`~ cause_group + DESCRIPTION, data = delay_with_desc, method = "class")
+
+
+##plot(as.party(tree), gp=gpar(cex=1), type = "simple")
+
+```
