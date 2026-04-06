@@ -37,11 +37,13 @@ class Delay:
         return True  # Generic delay is always possible
 
 
-def run_simulation(timesteps, vehicles, stops, delays, output, loop=False):
+def run_simulation(timesteps, vehicles, stops, delays, output, delay_output, loop=False):
     # Every time step, stop passenger arrival will be calculated and there will be a chance of delays
     # delays is list of delays that are possible in this simulation
 
     f = open(output, "w")
+    g = open(delay_output, "w")
+    print("Timestep,ID,Vehicle,Duration", file=g)
 
     for t in range(timesteps):
         print(f"--- Timestep {t} Summary ---", file=f)
@@ -115,6 +117,8 @@ def run_simulation(timesteps, vehicles, stops, delays, output, loop=False):
                         # Delay occurs
                         time = rng.negative_binomial(d.duration_n, d.duration_p) + d.duration_n # p = 1/(mu + 1)
                         v.remaining_delay += time
+                        
+                        print(f"{t},{d.ID},{v.ID},{time}", file=g)
 
                         if v.print_updates:
                             print(f"Vehicle {v.ID}: Delay type [{d.ID}] occurred with duration {time}. Remaining delay is now {v.remaining_delay}.", file=f)
@@ -122,5 +126,6 @@ def run_simulation(timesteps, vehicles, stops, delays, output, loop=False):
 
         print("\n", file=f)  # Newline at end of every timestep summary
     f.close()
+    g.close()
 
 # aw
